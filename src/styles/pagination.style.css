@@ -1,0 +1,11 @@
+.page{
+    padding: 0.5rem;
+    min-width: 2.5rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    cursor: pointer;
+    align-items: center;
+    border: 1px rgba(128, 128, 128, 0.400) solid;
+}

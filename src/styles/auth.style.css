@@ -1,0 +1,84 @@
+@import url('https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
+
+.error input{
+    color: tomato;
+}
+
+.error .field::placeholder {
+    color: rgba(255, 99, 71, 0.5) !important;
+}
+
+.error .field {
+    border-color: tomato !important;
+}
+
+.error label{
+    color: tomato !important;
+}
+
+.field {
+    position: relative;
+}
+
+.field input::placeholder {
+    color: transparent !important;
+}
+
+input:focus::placeholder,
+input:hover::placeholder {
+    color: rgba(128, 128, 128, 0.4) !important;
+}
+
+.field input:hover~label,
+.field input:focus~label,
+.field input:valid + label {
+    top: 0%;
+    transform: translateY(-100%);
+    color: rgba(0, 0, 0, 0.9);
+}
+
+.field label {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+.login {
+    transition: 0.2s;
+}
+
+.login:hover {
+    transform: scale(0.98);
+}
+
+.or {
+    position: relative;
+    border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+}
+
+.or::before {
+    content: 'Ou';
+    color: rgba(128, 128, 128, 0.6);
+    background: #F3F4F6;
+    padding: 0px 10px;
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.disabled{
+    opacity: 0.7;
+    filter: grayscale(1);
+}
+
+@media screen  and (max-width: 480px) {
+    .login-view{
+        width: 80%;
+    }
+}

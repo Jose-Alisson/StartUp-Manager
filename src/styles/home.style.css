@@ -1,0 +1,208 @@
+.hero {
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* não corta a imagem */
+    background-position: left bottom;
+    height: 90vh !important;
+
+    animation: moveBackground 20s ease-in-out infinite alternate;
+}
+
+.hero .actions button,
+.download {
+    width: clamp(150px, 50%, 350px);
+    background: linear-gradient(to right, #3B82F6, #2757a3);
+    padding: 1.25rem;
+    border-radius: 12px;
+    font-weight: 900;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease-in-out;
+}
+
+.hero .actions button:hover {
+    transform: scale(0.95);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+}
+
+.cards .card {
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px rgba(128, 128, 128, 0.5) solid;
+    transition: 0.2s ease-in-out;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.cards .card:hover {
+    background: white;
+    color: rgb(8, 8, 8);
+    animation: rotate 1s forwards;
+}
+
+.carrocel {
+    overflow: hidden;
+    padding: 2rem;
+    max-width: 100%;
+    display: flex;
+    gap: 2rem;
+    height: calc(350px);
+    position: relative;
+}
+
+
+.carrocel.reverse .group {
+    animation: spin-reverse 20s infinite linear;
+}
+
+.carrocel::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to right, #07081C, transparent, transparent,transparent, transparent, transparent, #07081C);
+}
+
+.carrocel .group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    animation: spin 20s infinite linear;
+}
+
+.carrocel::-webkit-scrollbar {
+    display: none;
+}
+
+.carrocel .group .card {
+    background-position: center;
+    padding: 2rem;
+    min-height: 350px;
+    min-width: 450px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+
+@keyframes spin {
+    from {
+        transform: translate(0);
+    }
+
+    to {
+        transform: translate(-100%);
+    }
+}
+
+@keyframes spin-reverse {
+    from {
+        transform: translate(-100%);
+    }
+
+    to {
+        transform: translate(0);
+    }
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg) scale(0.98);
+    }
+
+    100% {
+        transform: rotate(2deg) scale(0.98);
+    }
+}
+
+@keyframes moveBackground {
+    from {
+        background-position: left bottom;
+    }
+
+    to {
+        background-position: right top;
+    }
+}
+
+@media screen and (max-width: 640px) {
+
+    .hero{
+        animation: none;
+        padding: 2rem;
+    }
+
+    .hero-title{
+        font-size: clamp(1rem,10.5vw,2.5rem);
+    }
+
+    header > div{
+        padding: 1rem !important;
+    }
+
+    header .actions {
+        display: none;
+    }
+
+    .carrocel{
+        gap: 1rem;
+    }
+    .carrocel .group{
+        gap: 1rem;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    section {
+        height: auto !important;
+        flex-wrap: wrap;
+    }
+
+    section .left, section .right{
+        width: auto;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .p-16 {
+        padding: 2rem;
+    }
+
+    .cards {
+        max-width: 100%;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    }
+
+    .carrocel{
+        height: calc(175px);
+    }
+
+    .carrocel::before{
+        /* content: none; */
+    }
+
+    .carrocel .group .card{
+        min-width: 175px;
+        min-height: 175px;
+    }
+
+    .hero-sub{
+        font-size: clamp(1rem,2.5vw,4rem);
+    }
+
+    .cellphone{
+        max-height: 450px !important;
+    }
+}
