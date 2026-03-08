@@ -3,8 +3,12 @@ import { useState } from "react";
 import InputField from "../components/Input";
 import { AuthError, useAuth } from "../hooks/Auth";
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
+import { useOffline } from '../hooks/Offline';
 
 export function Login() {
+
+    let { show } = useOffline()
     let navigate = useNavigate()
     let { login, me, setAuth } = useAuth();
     let [email, setEmail] = useState("");
@@ -28,8 +32,12 @@ export function Login() {
                     break;
             }
         } catch (error) {
-            console.log(error)
             setAuthError("email ou senha invalido");
+            if (error instanceof AxiosError) {
+                if (error.code === AxiosError.ERR_NETWORK) {
+                    show()
+                }
+            }
         }
     }
 
@@ -46,9 +54,9 @@ export function Login() {
             <div className="or"></div>
             <div className="flex flex-col items-center">
                 <span>
-                    Ainda não tem acesso <a className="text-blue-500" href="./register">cadastre-se</a>
+                    Ainda não tem acesso <a className="text-blue-500" onClick={() => navigate("/auth/register")}>cadastre-se</a>
                 </span>
-                <span className="float-right mt-[12px]"><a className="text-blue-500" href="./forgot">Esqueci minha senha</a></span>
+                <span className="float-right mt-[12px]"><a className="text-blue-500" onClick={() => navigate("/auth/forgot")}>Esqueci minha senha</a></span>
             </div>
         </div>
     )

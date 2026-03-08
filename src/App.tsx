@@ -23,29 +23,47 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Tooltip,
   Legend
 } from "chart.js";
+import { WsStomp } from './hooks/WSStomp';
+import { MaskProvider } from './hooks/InputMask';
+import { OfflineProvider } from './hooks/Offline';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend
+);
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/start">
       <AuthProvider>
         <Routes>
           <Route path="/home" element={<Home />} />
-          <Route path="/auth" element={<Authencation />}>
+          <Route path="/auth" element={<OfflineProvider><Authencation /></OfflineProvider>}>
             <Route path='forgot' element={<Forgot />} />
             <Route path='login' element={<Login />} />
             <Route path='register' element={<Register />} />
             <Route path='' element={<Navigate to="login" replace />} />
           </Route>
-          <Route path='/dash' element={<Dashboard />}>
+          <Route path='/dash' element={
+            <OfflineProvider>
+              <Dashboard />
+            </OfflineProvider>}   >
             <Route path='manager' element={
               <PrivateRoute roles={['manager', 'admin']}>
-                <Manager />
+                <WsStomp>
+                  <MaskProvider>
+                    <Manager />
+                  </MaskProvider>
+                </WsStomp>
               </PrivateRoute>
             }>
               <Route path="users" element={<Users />} />

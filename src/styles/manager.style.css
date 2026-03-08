@@ -31,7 +31,7 @@
 
 section.users {
     padding: 1rem;
-    background: var(--cor-fundo-secundario);
+    background: #111827;
     border: 1px solid color-mix(in srgb, var(--cor-fundo-secundario) 90%, white);
     /* box-shadow: 0px 2px 10px rgba(14 14 14 / 70%); */
 }
@@ -42,7 +42,7 @@ section.users {
 }
 
 .users table tr {
-    cursor: pointer;
+    /* cursor: pointer; */
     display: flex;
     transition: 0.2s;
     padding: 0.35rem;
@@ -71,16 +71,19 @@ section.users {
 
 .users table td {
     font-size: 0.9em;
-    color: var(--cor-texto-secundario);
+    color: rgb(226, 226, 226);
+}
+
+.users table th{
+    color: #6B7280;
 }
 
 .users table tr:nth-child(even) {
     border-radius: 8px;
-    background-color: color-mix(in srgb, rgba(128, 128, 128, 0.100), white 5%);
+    background-color: color-mix(in srgb, #111827, white 5%);
 }
 
 .users table button {
-    background: var(--cor-fundo-principal);
     padding: 10px 10px;
     display: flex;
     align-items: center;
@@ -155,4 +158,10 @@ section.users {
     background-color: rgba(231, 76, 60, 0.15);
     /* #e74c3c com transparência */
     color: #e74c3c;
+}
+
+.categories-cards{
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
 }

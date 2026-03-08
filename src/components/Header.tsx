@@ -1,7 +1,8 @@
 
-import React, { navigate } from 'react';
+
 import '../styles/home.style.css'
 import { useNavigate } from 'react-router-dom';
+import TopBar from './TopBar';
 
 interface HeaderProps {
   onSearchChange: (val: string) => void;
@@ -72,7 +73,7 @@ export default function Header() {
 
   return (
     <header className="bg-white position-sticky top-[0]">
-      <div className="flex h-[70px] justify-between items-center" style={{padding: '0rem 4rem', margin: 'auto'}}>
+      <div className="flex h-[70px] justify-between items-center" style={{ padding: '0rem 4rem', margin: 'auto' }}>
         <div className="logo">
           <h1 className="text-lg font-black tracking-tight leading-none">StartUp <span className="text-blue-500">Guide</span></h1>
         </div>
@@ -82,6 +83,14 @@ export default function Header() {
         <div className="actions flex gap-4 items-center">
           <button onClick={() => navigate("/auth/register")} className="signIn p-2 w-[120px] rounded-[12px] bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/50">Começar</button>
           <button onClick={() => navigate("/auth/login")} className="signUp p-2 text-center rounded-[12px] border-2 border-blue-500 bg-transparent text-blue-500 font-bold flex text-nowap items-center justify-center">Entrar &nbsp; &nbsp;<i className="fi fi-rr-arrow-right-to-bracket flex"></i></button>
+        </div>
+        <div className="bars hidden">
+          <TopBar>
+            <div className="flex flex-col gap-4 p-4">
+              <button onClick={() => navigate("/auth/register")} className=" p-2 rounded-[12px] bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/50">Começar</button>
+              <button onClick={() => navigate("/auth/login")} className=" p-2 text-center rounded-[12px] border-2 border-blue-500 bg-transparent text-blue-500 font-bold flex text-nowap items-center justify-center">Entrar &nbsp; &nbsp;<i className="fi fi-rr-arrow-right-to-bracket flex"></i></button>
+            </div>
+          </TopBar>
         </div>
       </div>
     </header>

@@ -38,12 +38,12 @@ export default function HeroBar() {
     }, []);
 
     return (
-        <section ref={heroRef} className="hero h-[100vh] bg-[url('/building-2378893_1920.jpg')] w-full object-cover flex p-[4rem] bg-fixed">
+        <section ref={heroRef} className="hero h-[100vh] bg-[url('/start/building-2378893_1920.jpg')] w-full object-cover flex p-[4rem] bg-fixed">
             <div className="left w-[50%] flex flex-col justify-center gap-[2rem]">
                 <h1 className="hero-title text-[clamp(1rem,4.5vw,6rem)] font-black text-white leading-snug">Transforme ideias em negócios reais</h1>
                 <p className="hero-sub text-gray-200 text-2xl">Do zero à execução, o StartUp Guide te acompanha na criação do seu próprio negócio. Menos incerteza, mais estratégia e um caminho claro para crescer.</p>
                 <div className="hero-cta actions">
-                    <button onClick={() => navigate("/auth/register")} style={{"min-width": "200px"}} className="w-[150px, 3vw, 350px]">Comece Hoje &nbsp;&nbsp;<i className="fi fi-rr-arrow-right flex"></i></button>
+                    <button onClick={() => navigate("/auth/register")} style={{minWidth: "200px"}} className="w-[150px, 3vw, 350px]">Comece Hoje &nbsp;&nbsp;<i className="fi fi-rr-arrow-right flex"></i></button>
                 </div>
             </div>
         </section>

@@ -1,18 +1,10 @@
-import { createContext, useState, useContext, navigate, useEffect } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
+import { API_URL as API } from "../constants";
 
-const API_URL = `${"http://localhost:8080"}/accounts`
-
-export class AuthError extends Error {
-  body: any;
-
-  constructor(message: string, body: any) {
-    super(message);
-    this.name = "AuthError";
-    this.body = body;
-  }
-}
+const API_URL = `${API}/accounts`
 
 let getInitialAuth = () => {
   const token = localStorage.getItem("token")
@@ -34,92 +26,39 @@ let getInitialAuth = () => {
   }
 }
 
-const AuthContext = createContext();
+const AuthContext = createContext<any>(null);
 
 export function AuthProvider({ children }) {
   const [{ user, token }, setAuth] = useState(() => getInitialAuth())
 
   const login = async (email, password) => {
-    const res = await fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      setAuth({ user: data.account, token: data.token })
-      return data
-    } else {
-      throw new Error("Login falhou");
-    }
+    const res = await axios.post(`${API_URL}/login`, { email, password }).then(data => data.data);
+    setAuth({ user: res.account, token: res.token })
+    return res
   };
 
   const register = async (username, email, password) => {
-
-    const res = await fetch("http://localhost:8080/accounts/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
-    });
-
-    if (!res.ok) {
-      const errorBody = await res.json();
-      throw new AuthError("Registro falhou", errorBody);
-    }
-
-    return await res.json();
+    return axios.post("http://localhost:8080/accounts/create", { username, email, password }).then(data => data.data);
   }
 
   const sendResetCode = async (email) => {
-    const res = await fetch(`${API_URL}/${email}/send-reset-password`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok)
-      error(res.status)
+    return axios.patch(`${API_URL}/${email}/send-reset-password`).then(data => data.data);
   };
 
   const verifyCode = async (email, code) => {
-    const res = await fetch(`${API_URL}/${email}/verify-code-reset-password`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code }),
-    });
-
-    if (!res.ok)
-      error(res.status)
+    return axios.patch(`${API_URL}/${email}/verify-code-reset-password`, { code }).then(data => data.data);
   }
 
   const verifyAndResetCode = async (email, code, newPassword) => {
-    const res = await fetch(`${API_URL}/${email}/reset-password`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, password: newPassword }),
-    });
-
-    if (!res.ok)
-      error(res.status)
+    return axios.patch(`${API_URL}/${email}/reset-password`, { code, password: newPassword }).then(data => data.data);
   }
 
   const me = async () => {
-    const res = await fetch(`${API_URL}/me`, {
-      method: 'GET',
+    return axios.get(`${API_URL}/me`, {
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       }
-    })
-
-    if (!res.ok)
-      error(res.status)
-
-    return await res.json()
-  }
-
-  const error = (error) => {
-    throw new AuthError("", error)
+    }).then(data => data.data);
   }
 
   const logout = () => {
@@ -135,4 +74,4 @@ export function AuthProvider({ children }) {
 }
 
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext<any>(AuthContext);

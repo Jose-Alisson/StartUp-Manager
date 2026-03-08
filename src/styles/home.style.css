@@ -155,6 +155,10 @@
         display: none;
     }
 
+    header .bars {
+        display: block;
+    }
+
     .carrocel{
         gap: 1rem;
     }
