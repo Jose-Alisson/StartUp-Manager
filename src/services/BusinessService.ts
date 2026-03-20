@@ -55,6 +55,15 @@ export class BusinessService {
         })
         return res.data
     }
+
+    async delete(idOrName) {
+        const res = await axios.delete(`${this.URL}/${idOrName}/delete`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        })
+        return res.data
+    }
 }
 
 export function useBusinessService() {
@@ -91,10 +100,15 @@ export function useBusinessService() {
         return handler(() => businessService.search(term, pageable))
     }
 
+    const deleteBusiness = (idOrName) => {
+        return handler(() => businessService.delete(idOrName))
+    }
+
     return {
         create,
         update,
         readAll,
-        search
+        search,
+        deleteBusiness
     }
 }

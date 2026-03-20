@@ -1,4 +1,4 @@
-import React, { use, useCallback, useEffect, useMemo, useState } from "react";
+import React, { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../hooks/Auth";
 import { BusinessService, useBusinessService } from "../services/BusinessService";
 import { Dropdown, DropOption, SimpleInputField } from "../components/Input";
@@ -15,6 +15,7 @@ import { retry } from "../utils/PollingRetry";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useStomp } from "../hooks/WSStomp";
+import { ScrollStepper } from "../components/ScrollStep";
 
 
 const type = {
@@ -32,7 +33,7 @@ const checkListType = {
     "EQUIPMENT": "Equipamento",
     "TEAM": "Time",
     "LOCATION": "Localização",
-    "LEGAL": "Legal"
+    "LEGAL": "Legislação"
 }
 
 interface BusinessRequest {
@@ -77,7 +78,7 @@ export default function PremiumCard({ onSelect, name, isFeatured, imageUrl, desc
             {/* CONTENT */}
             <div className="space-y-4 p-5 flex-1">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-700 font-merriweather">
                         {name}
                     </h3>
                     <p className="mt-1 text-sm text-gray-400 line-clamp-3">
@@ -437,7 +438,8 @@ function useCreateOrUpdateBusiness({ business = null, onRedirect }) {
         removeItemByFieldListForm,
         sortChecklistByType,
         create,
-        update
+        update,
+        businessService
     }
 }
 
@@ -461,7 +463,7 @@ function CreateBusiness({ onRedirect }) {
             {isActive("add-tip") && <ModalAddTip onAdd={(value) => { addItemInFildListByForm("tips", value); setModalActive("") }} onClose={setModalActive}></ModalAddTip>}
             {isActive("add-checklist") && <ModalAddCheckList onAdd={(value) => addItemInFildListByForm("checkList", value)} onClose={setModalActive}></ModalAddCheckList>}
 
-            <section className="w-full h-full flex flex-col gap-5 overflow-auto p-8 relative">
+            <section className="w-full h-full flex flex-col gap-8 overflow-auto p-8 relative">
                 <div>
                     <h1 className="text-5xl font-bold text-gray-800">
                         Crie Seus Negócios
@@ -476,7 +478,15 @@ function CreateBusiness({ onRedirect }) {
                 </div>
                 <div className="grid grid-cols-2 gap-8 p-8 bg-white rounded-[20px]">
                     <div className="flex flex-col gap-4 col-span-2" style={{ "--color": "#F4F4FC" } as React.CSSProperties}>
-                        <h2 className="text-3xl text-gray-700 font-bold flex items-center gap-4"><i className="fi fi-rr-building flex p-4 bg-[#F4F4FC] rounded-[20px]"></i> Informações Básicas</h2>
+                        <div className="flex gap-4 items-center border-b border-b-[1px] border-gray-200 pb-4">
+                            <h2 className="text-3xl text-gray-800 font-bold flex items-center gap-4">
+                                <i className="fi fi-rr-building flex p-4 bg-[#F0DACE] rounded-[20px]"></i>
+                            </h2>
+                            <div>
+                                <h2 className="text-3xl text-gray-800 font-bold flex items-center gap-4">Informações Básicas</h2>
+                                <p className="text-sm text-gray-500">Preencha as informações básicas do seu negócio</p>
+                            </div>
+                        </div>
                         <div className="grid gap-4 grid-cols-2">
                             <SimpleInputField label={"Nome do Négocio *"} value={form.name} placeholder={"Ex: Escola de Programação"} onChange={(e) => setValueForm("name", e)}>
                                 <Error error={errors?.['name']} />
@@ -499,7 +509,7 @@ function CreateBusiness({ onRedirect }) {
                     </div>
                 </div>
                 <div className="p-8 bg-white rounded-[20px] flex flex-col gap-4">
-                    <h2 className="text-3xl text-gray-700 font-bold flex gap-4 items-center"><i className="fi fi-rr-law-book flex p-4 bg-[#F4F4FC] rounded-[20px]"></i> Estrutura Legal</h2>
+                    <h2 className="text-3xl text-gray-700 font-bold flex gap-4 items-center"><i className="fi fi-rr-law-book flex p-4 bg-[#D4E4F7] rounded-[20px]"></i> Estrutura Legal</h2>
                     <div className="flex gap-4 items-start">
                         <div className="flex-1">
                             <Dropdown initial={"Categoria"} onChange={(value) => setValueForm("type", value)}>
@@ -533,8 +543,14 @@ function CreateBusiness({ onRedirect }) {
                         </div>
                     ))}
                 </div>
-                <div className="p-8 bg-[#111827] rounded-[20px] flex flex-col gap-4 " style={{ "--color": "#1c1c2c", "--text-color": "#9CA3AF" } as React.CSSProperties}>
-                    <h2 className="text-3xl text-gray-300 font-bold flex gap-4 items-center"><i className="fi fi-rr-chart-mixed-up-circle-dollar flex  p-4 bg-[#22223C] rounded-[20px]"></i> Investimento Financeiro</h2>
+                <div className="p-8 rounded-[20px] bg-white flex flex-col gap-4 " style={{ "--color": "#F4F4FC" } as React.CSSProperties}>
+                    <div className="flex gap-4 items-center border-b border-b-[1px] border-gray-200 pb-4">
+                        <h2 className="text-3xl text-gray-800 font-bold flex gap-4 items-center"><i className="fi fi-rr-chart-mixed-up-circle-dollar flex  p-4 bg-[#FDF3D0] rounded-[20px]"></i></h2>
+                        <div>
+                            <h2 className="text-3xl text-gray-800 font-bold flex gap-4 items-center">Investimento Financeiro</h2>
+                            <p className="text-sm text-gray-500">Números e projeção de retorno</p>
+                        </div>
+                    </div>
                     <div className="grid grid-cols-[1fr_1fr_1fr] gap-4">
                         <div className="flex flex-col gap-2">
                             {form.initialInvestment && <p className="text-sm text-gray-400 mt-2">Investimento Inicial*</p>}
@@ -555,17 +571,17 @@ function CreateBusiness({ onRedirect }) {
                         </div>
                     </div>
                 </div>
-                <div className="rounded-[20px] p-8 flex flex-col gap-4 bg-[#111827]">
+                <div className="rounded-[20px] bg-white p-8 flex flex-col gap-4">
                     <div className="flex gap-4 justify-between items-center">
-                        <h2 className="text-3xl text-gray-300 font-bold flex items-center gap-4"><i className="fi fi-rr-lightbulb-on flex p-4 bg-[#22223C] rounded-[20px]"></i> Dicas</h2>
-                        <button onClick={() => setModalActive("add-tip")} className="p-2 bg-[#1C1C2C] border border-[#50505B] rounded-[12px] text-gray-400 font-bold">Adicionar Dicas</button>
+                        <h2 className="text-3xl text-gray-800 font-bold flex items-center gap-4"><i className="fi fi-rr-lightbulb-on flex p-4 bg-[#F0DACE] rounded-[20px]"></i> Dicas</h2>
+                        <button onClick={() => setModalActive("add-tip")} className="p-2 bg-transparent border border-gray-300 border-dashed rounded-3xl text-gray-400 font-bold flex items-center justify-center text-sm"><i className="fi fi-rr-plus-small flex"></i>&nbsp;Adicionar dicas</button>
                     </div>
                     <div className="tips flex flex-col gap-2">
                         {
                             form?.['tips'].length ?
                                 form?.['tips'].map((item, index) => (
-                                    <div key={index} className="tip border-l-[5px] border-primaryBlue p-2 flex gap-2 justify-between items-center">
-                                        <p className="italic text-gray-200">"{item}"</p>
+                                    <div key={index} className="tip border rounded-xl p-2 flex gap-2 justify-between items-center">
+                                        <p className="italic text-gray-400">"{item}"</p>
                                         <span className="close text-gray-400 hover:text-red-500" onClick={() => removeItemByFieldListForm("tips", item)}>
                                             <i className="fi fi-rr-cross-small flex"></i>
                                         </span>
@@ -575,19 +591,19 @@ function CreateBusiness({ onRedirect }) {
                         }
                     </div>
                 </div>
-                <div className="rounded-[20px] p-8 flex flex-col gap-4 bg-[#111827]">
+                <div className="rounded-[20px] bg-white p-8 flex flex-col gap-4">
                     <div className="flex justify-between gap-4 items-center">
-                        <h2 className="text-3xl text-gray-300 font-bold flex gap-4 items-center"><i className="fi fi-rr-checkbox flex p-4 bg-[#22223C] rounded-[20px]"></i> Checklist</h2>
-                        <button className="p-2 bg-[#1C1C2C] border border-[#50505B] rounded-[12px] text-gray-400 font-bold" onClick={() => setModalActive("add-checklist")}>Adicionar Check</button>
+                        <h2 className="text-3xl text-gray-800 font-bold flex gap-4 items-center"><i className="fi fi-rr-checkbox flex p-4 bg-[#D0EAD9] rounded-[20px]"></i> Checklist</h2>
+                        <button className="p-2 bg-transparent border border-gray-300 border-dashed rounded-3xl text-gray-400 font-bold flex items-center justify-center text-sm" onClick={() => setModalActive("add-checklist")}><i className="fi fi-rr-plus-small flex"></i>&nbsp;Adicionar checklist</button>
                     </div>
-                    <div className="checklist flex flex-col gap-2">
+                    <div className="checklist flex flex-wrap gap-2">
                         {
                             form.checkList.length ? sortChecklistByType().map((item, index) => (
-                                <div key={index} className="text-gray-300 mb-4 border-l-[5px] border-primaryBlue p-2">
+                                <div key={index} className="text-gray-800 mb-4 p-2">
                                     <h2 className="mb-2 p-2 text-xl font-black">{checkListType[item.name]}</h2>
                                     <div className="flex gap-2 flex-wrap">
                                         {item.value?.map((value, index) => (
-                                            <div key={index} className="p-2 border rounded flex gap-2 items-center">
+                                            <div key={index} className="p-2 border rounded-xl flex gap-2 items-center">
                                                 <span className="">{value.title}</span>
                                                 <span className="close hover:text-red-500" onClick={() => removeItemByFieldListForm("checkList", value)}>
                                                     <i className="fi fi-rr-cross-small flex"></i>
@@ -600,16 +616,18 @@ function CreateBusiness({ onRedirect }) {
                         }
                     </div>
                 </div>
-                <section className="flex flex-col items-start">
-                    <button disabled={loading?.['create']} onClick={async () => {
-                        console.log("123")
-                        if (await create()) {
-                            console.log("iee")
-                            toast.success("Negócio criado com sucesso")
-                            onRedirect("view")
-                        }
-                    }} className="p-[0.75rem] bg-blue-200 border-primaryBlue rounded-[20px] w-[175px] text-[#191927] font-bold flex items-center justify-center transition hover:scale-[0.98] flex-1"><i className="fi fi-rr-floppy-disks flex"></i>&nbsp;&nbsp; {loading?.['create'] ? 'Criando ...' : 'Criar'}</button>
-                </section>
+                <div className=""></div>
+                <div>
+                    <section className="flex flex-col items-start float-right">
+                        <button disabled={loading?.['create']} onClick={async () => {
+                            if (await create()) {
+                                toast.success("Negócio criado com sucesso")
+                                onRedirect("view")
+                            }
+                        }} className="p-[0.75rem] bg-blue-200 border-primaryBlue rounded-[20px] w-[175px] text-[#191927] font-bold flex items-center justify-center transition hover:scale-[0.98] flex-1"><i className="fi fi-rr-floppy-disks flex"></i>&nbsp;&nbsp; {loading?.['create'] ? 'Criando ...' : 'Criar'}</button>
+                    </section>
+                </div>
+
             </section>
         </>
     )
@@ -646,7 +664,7 @@ function ModalAddCheckList({ onAdd, onClose }) {
                     <DropOption label={"Equipamento"} value={"EQUIPMENT"}></DropOption>
                     <DropOption label={"Time"} value={"TEAM"}></DropOption>
                     <DropOption label={"Local"} value={"LOCATION"}></DropOption>
-                    <DropOption label={"Legal"} value={"LEGAL"}></DropOption>
+                    <DropOption label={"Legislação"} value={"LEGAL"}></DropOption>
                 </Dropdown>
                 <button onClick={() => onAdd(form)} className="bg-primaryBlue text-white rounded p-2">Ok</button>
             </div>
@@ -719,15 +737,15 @@ function UpdateBusiness({ business, onRedirect = (String) => { } }) {
         removeItemByFieldListForm,
         sortChecklistByType,
         errors,
-        update } = useCreateOrUpdateBusiness({ business, onRedirect })
+        update, businessService } = useCreateOrUpdateBusiness({ business, onRedirect })
     const { isActive, setModalActive } = useBusinessModal()
+
     return (
         <>
             {isActive("add-legal") && <ModalAddLegal addItemInFildListByForm={addItemInFildListByForm} onClose={setModalActive} />}
             {isActive("add-tip") && <ModalAddTip onAdd={(value) => { addItemInFildListByForm("tips", value); setModalActive("") }} onClose={setModalActive}></ModalAddTip>}
             {isActive("add-checklist") && <ModalAddCheckList onAdd={(value) => addItemInFildListByForm("checkList", value)} onClose={setModalActive}></ModalAddCheckList>}
-
-            <section className="w-full h-full flex flex-col gap-5 overflow-auto p-8 relative">
+            <section className="w-full h-full flex flex-col gap-8 overflow-auto p-8 relative">
                 <div>
                     <h1 className="text-5xl font-bold text-gray-800">
                         Edite Seus Negócios
@@ -737,12 +755,20 @@ function UpdateBusiness({ business, onRedirect = (String) => { } }) {
                     </p>
                 </div>
                 <div className="p-8 bg-white rounded-[20px] flex flex-col gap-2">
-                    <h2 className="text-3xl text-gray-700 font-bold flex items-center gap-4"><i className="fi fi-rr-picture flex p-4 bg-[#F4F4FC] rounded-[20px]"></i> Logo do Negócio</h2>
+                    <h2 className="text-3xl text-gray-800 font-bold flex items-center gap-4"><i className="fi fi-rr-picture flex p-4 bg-[#F4F4FC] rounded-[20px]"></i> Logo do Negócio</h2>
                     <UploadFile view={business.imageUrl} onFile={setThum} onRemove={() => setValueForm("imageUrl", null)}></UploadFile>
                 </div>
                 <div className="grid grid-cols-2 gap-8 p-8 bg-white rounded-[20px]">
                     <div className="flex flex-col gap-4 col-span-2" style={{ "--color": "#F4F4FC" } as React.CSSProperties}>
-                        <h2 className="text-3xl text-gray-700 font-bold flex items-center gap-4"><i className="fi fi-rr-building flex p-4 bg-[#F4F4FC] rounded-[20px]"></i> Informações Básicas</h2>
+                        <div className="flex gap-4 items-center border-b border-b-[1px] border-gray-200 pb-4">
+                            <h2 className="text-3xl text-gray-800 font-bold flex items-center gap-4">
+                                <i className="fi fi-rr-building flex p-4 bg-[#F0DACE] rounded-[20px]"></i>
+                            </h2>
+                            <div>
+                                <h2 className="text-3xl text-gray-800 font-bold flex items-center gap-4">Informações Básicas</h2>
+                                <p className="text-sm text-gray-500">Preencha as informações básicas do seu negócio</p>
+                            </div>
+                        </div>
                         <div className="grid gap-4 grid-cols-2">
                             <SimpleInputField label={"Nome do Négocio *"} value={form.name} placeholder={"Ex: Escola de Programação"} onChange={(e) => setValueForm("name", e)}>
                                 <Error error={errors?.['name']} />
@@ -765,7 +791,7 @@ function UpdateBusiness({ business, onRedirect = (String) => { } }) {
                     </div>
                 </div>
                 <div className="p-8 bg-white rounded-[20px] flex flex-col gap-4 shadow-sm">
-                    <h2 className="text-3xl text-gray-700 font-bold flex gap-4 items-center"><i className="fi fi-rr-law-book flex p-4 bg-[#F4F4FC] rounded-[20px]"></i> Estrutura Legal</h2>
+                    <h2 className="text-3xl text-gray-800 font-bold flex gap-4 items-center"><i className="fi fi-rr-law-book flex p-4 bg-[#D4E4F7] rounded-[20px]"></i> Estrutura Legal</h2>
                     <div className="flex gap-4 items-start">
                         <div className="flex-1">
                             <Dropdown initial={form.type || "Categoria"} onChange={(value) => setValueForm("type", value)}>
@@ -799,8 +825,14 @@ function UpdateBusiness({ business, onRedirect = (String) => { } }) {
                         </div>
                     ))}
                 </div>
-                <div className="p-8 bg-[#111827] rounded-[20px] flex flex-col gap-4 " style={{ "--color": "#1c1c2c", "--text-color": "#9CA3AF" } as React.CSSProperties}>
-                    <h2 className="text-3xl text-gray-300 font-bold flex gap-4 items-center"><i className="fi fi-rr-chart-mixed-up-circle-dollar flex  p-4 bg-[#22223C] rounded-[20px]"></i> Investimento Financeiro</h2>
+                <div className="p-8 bg-white rounded-[20px] flex flex-col gap-4 " style={{ "--color": "#F4F4FC" } as React.CSSProperties}>
+                    <div className="flex gap-4 items-center border-b border-b-[1px] border-gray-200 pb-4">
+                        <h2 className="text-3xl text-gray-800 font-bold flex gap-4 items-center"><i className="fi fi-rr-chart-mixed-up-circle-dollar flex  p-4 bg-[#FDF3D0] rounded-[20px]"></i></h2>
+                        <div>
+                            <h2 className="text-3xl text-gray-800 font-bold flex gap-4 items-center">Investimento Financeiro</h2>
+                            <p className="text-sm text-gray-500">Números e projeção de retorno</p>
+                        </div>
+                    </div>
                     <div className="grid grid-cols-[1fr_1fr_1fr] gap-4">
                         <div className="flex flex-col gap-2">
                             {form.initialInvestment && <p className="text-sm text-gray-400 mt-2">Investimento Inicial*</p>}
@@ -821,36 +853,39 @@ function UpdateBusiness({ business, onRedirect = (String) => { } }) {
                         </div>
                     </div>
                 </div>
-                <div className="rounded-[20px] p-8 flex flex-col gap-4 bg-[#111827]">
+                <div className="rounded-[20px] p-8 flex flex-col gap-4 bg-white">
                     <div className="flex gap-4 justify-between items-center">
-                        <h2 className="text-3xl text-gray-300 font-bold flex items-center gap-4"><i className="fi fi-rr-lightbulb-on flex  p-4 bg-[#22223C] rounded-[20px]"></i> Dicas</h2>
-                        <button onClick={() => setModalActive("add-tip")} className="p-2 bg-[#1C1C2C] border border-[#50505B] rounded-[12px] text-gray-400 font-bold ">Adicionar Dicas</button>
+                        <h2 className="text-3xl text-gray-800 font-bold flex items-center gap-4"><i className="fi fi-rr-lightbulb-on flex  p-4 bg-[#F0DACE] rounded-[20px]"></i> Dicas</h2>
+                        <button onClick={() => setModalActive("add-tip")} className="p-2 bg-transparent border border-gray-300 border-dashed rounded-3xl text-gray-400 font-bold flex items-center justify-center text-sm"><i className="fi fi-rr-plus-small flex"></i>&nbsp;Adicionar dicas</button>
                     </div>
                     <div className="tips flex flex-col gap-2">
                         {
                             form?.['tips'].length ?
                                 form?.['tips']?.map((item, index) => (
-                                    <div key={index} className="tip border-l-[5px] border-primaryBlue p-2">
-                                        <p className="italic text-gray-200">"{item}"</p>
+                                    <div key={index} className="tip p-2 flex gap-2 justify-between items-center border rounded-xl">
+                                        <p className="italic text-gray-400">"{item}"</p>
+                                        <span className="close text-gray-400 hover:text-red-500" onClick={() => removeItemByFieldListForm("tips", item)}>
+                                            <i className="fi fi-rr-cross-small flex"></i>
+                                        </span>
                                     </div>
                                 ))
                                 : <h1 className="text-gray-400">Nenhuma dica</h1>
                         }
                     </div>
                 </div>
-                <div className="rounded-[20px] p-8 flex flex-col gap-4 bg-[#111827]">
+                <div className="rounded-[20px] p-8 flex flex-col gap-4 bg-white">
                     <div className="flex justify-between gap-4 items-center">
-                        <h2 className="text-3xl text-gray-300 font-bold flex gap-4 items-center"><i className="fi fi-rr-checkbox flex  p-4 bg-[#22223C] rounded-[20px]"></i> Checklist</h2>
-                        <button className="p-2 bg-[#1C1C2C] border border-[#50505B] rounded-[12px] text-gray-400 font-bold" onClick={() => setModalActive("add-checklist")}>Adicionar Check</button>
+                        <h2 className="text-3xl text-gray-800 font-bold flex gap-4 items-center"><i className="fi fi-rr-checkbox flex  p-4 bg-[#D0EAD9] rounded-[20px]"></i> Checklist</h2>
+                        <button className="p-2 bg-transparent border border-gray-300 border-dashed rounded-3xl text-gray-400 font-bold flex items-center justify-center text-sm" onClick={() => setModalActive("add-checklist")}><i className="fi fi-rr-plus-small flex"></i>&nbsp;Adicionar checklist</button>
                     </div>
-                    <div className="checklist flex flex-col gap-2">
+                    <div className="checklist flex flex-wrap gap-2">
                         {
                             form.checkList.length ? sortChecklistByType().map((item, index) => (
-                                <div key={index} className="text-gray-300 mb-4 border-l-[5px] border-primaryBlue p-2">
+                                <div key={index} className="text-gray-800 mb-4 border-primaryBlue p-2">
                                     <h2 className="mb-2 p-2 text-xl font-black">{checkListType[item.name]}</h2>
                                     <div className="flex gap-2 flex-wrap">
                                         {item.value?.map((value, index) => (
-                                            <div key={index} className="p-2 border rounded flex gap-2 items-center">
+                                            <div key={index} className="p-2 border rounded-xl flex gap-2 items-center">
                                                 <span className="">{value.title}</span>
                                                 <span className="close hover:text-red-500" onClick={() => removeItemByFieldListForm("checkList", value)}>
                                                     <i className="fi fi-rr-cross-small flex"></i>
@@ -863,14 +898,23 @@ function UpdateBusiness({ business, onRedirect = (String) => { } }) {
                         }
                     </div>
                 </div>
-                <section className="flex flex-col items-start">
-                    <button disabled={loading?.['update']} onClick={async () => {
-                        if (await update(business.id)) {
-                            toast.success("Negócio editado com sucesso")
-                            onRedirect("view")
-                        }
-                    }} className="p-[0.75rem] bg-blue-200 border-primaryBlue rounded-[20px] w-[175px] text-[#191927] font-bold flex items-center justify-center transition hover:scale-[0.98] flex-1"><i className="fi fi-rr-floppy-disks flex"></i>&nbsp;&nbsp; {loading?.['create'] ? 'Salvando ...' : 'Salvar'}</button>
-                </section>
+                <div className=""></div>
+                <div className="">
+                    <section className="flex items-start gap-4 w-[450px] float-right">
+                        <button className="p-[0.75rem] bg-red-500 border-primaryBlue rounded-[20px] w-[175px] text-[#191927] font-bold flex items-center justify-center transition hover:scale-[0.98] flex-1" onClick={async () => {
+                            if (await businessService.deleteBusiness(business.id)) {
+                                toast.success("Negócio excluído com sucesso")
+                                onRedirect("view")
+                            }
+                        }}><i className="fi fi-rr-trash"></i>&nbsp;&nbsp;Excluir</button>
+                        <button disabled={loading?.['update']} onClick={async () => {
+                            if (await update(business.id)) {
+                                toast.success("Negócio editado com sucesso")
+                                onRedirect("view")
+                            }
+                        }} className="p-[0.75rem] bg-blue-200 border-primaryBlue rounded-[20px] w-[175px] text-[#191927] font-bold flex items-center justify-center transition hover:scale-[0.98] flex-1"><i className="fi fi-rr-floppy-disks flex"></i>&nbsp;&nbsp; {loading?.['create'] ? 'Salvando ...' : 'Salvar'}</button>
+                    </section>
+                </div>
             </section>
         </>
     )

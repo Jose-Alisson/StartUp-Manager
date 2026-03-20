@@ -1,1 +1,1 @@
-export const API_URL = false ? '/start/main' : 'https://pizzariasapucaians.com.br/start/main';
+export const API_URL = false ? '/start/main' : "http://localhost:8080";

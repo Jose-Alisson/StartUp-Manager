@@ -141,7 +141,7 @@ export default function Categories() {
         <section className="p-8 bg-blue-50">
             <Modal active={isActive("new-category")} title="Nova categoria" onClose={closeModal}>
                 <div className="content p-2 mt-2 w-[400px] gap-4 flex flex-col">
-                    <UploadFileSvg onFile={setThum} onRemove={() => setThum(undefined)} height={200}></UploadFileSvg>
+                    <UploadFileSvg onFile={setThum} onRemove={() => setThum(null)} height={200}></UploadFileSvg>
                     <SimpleInputField error={errors?.name} value={form?.name} placeholder="name" onChange={v => changeForm("name", v)}>
                         {errors?.name && <p className="text-red-500">{errors?.name}</p>}
                     </SimpleInputField>

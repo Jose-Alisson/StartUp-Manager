@@ -165,3 +165,7 @@ section.users {
     gap: 1rem;
     grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
 }
+
+h2{
+    font-family: 'Merriweather', serif;
+}

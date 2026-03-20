@@ -6,7 +6,7 @@ export default function Manager() {
     return (
         <section className="flex h-[100dvh]">
             <SideBar></SideBar>
-            <main className="w-full h-full overflow-auto bg-blue-50">
+            <main className="w-full h-full overflow-auto bg-[#EFF6FF]">
                 <ToastContainer
                     position="top-right"
                     autoClose={3000}

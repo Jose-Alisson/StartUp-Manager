@@ -161,7 +161,7 @@ export default function Users() {
 
     useEffect(() => {
         let handler = setTimeout(async () => {
-            const { data, error } = await accountService.search(term, { page: pageNumber })
+            const { data, error } = await accountService.search(term, { page: pageNumber, size: 10 })
             if (!error) {
                 setAccounts(data)
             }
@@ -209,10 +209,10 @@ export default function Users() {
                 </div>
                 <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-8 bg-white rounded-[20px] p-4">
-                        <div onClick={() => setViewData('day')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'day' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Dia</div>
-                        <div onClick={() => setViewData('week')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'week' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Semana</div>
-                        <div onClick={() => setViewData('month')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'month' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Mes</div>
-                        <div onClick={() => setViewData('year')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'year' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Ano</div>
+                        <div onClick={() => setViewData('day')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'day' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Dias</div>
+                        <div onClick={() => setViewData('week')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'week' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Semanas</div>
+                        <div onClick={() => setViewData('month')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'month' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Meses</div>
+                        <div onClick={() => setViewData('year')} className={`transition bg-white cursor-pointer text-gray-400 text-center text-xl font-bold option p-4 rounded-[20px] border ${viewData == 'year' ? '!text-blue-500 !bg-blue-100 !shadow-[0_0_0_2px_#3B82F6]' : ''}`}>Anos</div>
                     </div>
                     <div className="p-4 rounded-[20px] bg-white h-[350px]">
                         <Line data={data} options={options} />
